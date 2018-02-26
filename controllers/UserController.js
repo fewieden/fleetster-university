@@ -5,6 +5,12 @@ class UserController {
 		this.entityDao = entityDao;
 	}
 
+	removeSensitiveData(model) {
+		if (model) {
+			delete model.password;
+		}
+	}
+
 	async createUserRoute(req, res) {
 		console.log('createUserRoute');
 		// TODO: register user
@@ -14,22 +20,26 @@ class UserController {
 
 	async readUserRoute(req, res) {
 		console.log('readUserRoute');
-		// TODO: filter sensitive data
+
 		let model = await this.entityDao.findById(this.entity, req.params.id);
+		this.removeSensitiveData(model);
 		res.send(model);
 	}
 
 	async updateUserRoute(req, res) {
 		console.log('updateUserRoute');
-		// TODO: filter sensitive data
+
+		delete req.body.password;
+		req.body._id = req.params.id;
 		let model = await this.entityDao.update(this.entity, req.body);
+		this.removeSensitiveData(model);
 		res.send(model);
 	}
 
 	async deleteUserRoute(req, res) {
 		console.log('deleteUserRoute');
-		// TODO: filter sensitive data
 		let model = await this.entityDao.deleteById(this.entity, req.params.id);
+		this.removeSensitiveData(model);
 		res.send(model);
 	}
 
