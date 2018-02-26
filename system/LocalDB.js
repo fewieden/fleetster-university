@@ -7,19 +7,32 @@ const basePath = path.join(__dirname, '..', 'LocalDB');
 
 const write = promisify(fs.writeFile);
 const read = promisify(fs.readFile);
-const stat = promisify(fs.fstat);
+const stat = promisify(fs.stat);
+const mkdir = promisify(fs.mkdir);
 const unlink = promisify(fs.unlink);
 
 class LocalDB extends EntityDao {
 
 	constructor() {
 		super();
-		// TODO: create LocalDB directory
+	}
+
+	async checkDirectory() {
+		try {
+			(await stat(basePath)).isDirectory();
+		} catch (error) {
+			console.log(error.code);
+			if(error.code === 'ENOENT') {
+				await mkdir(basePath);
+			}
+		}
 	}
 
 	async insert(entity, data) {
 		try {
-			const _id = Date.now();
+			await this.checkDirectory();
+
+			const _id = Date.now().toString();
 			data._id = _id;
 			await write(path.join(basePath, `${entity}_${_id}.json`), JSON.stringify(data));
 			return {_id};
@@ -30,6 +43,8 @@ class LocalDB extends EntityDao {
 
 	async findById(entity, id) {
 		try {
+			await this.checkDirectory();
+
 			const file = await stat(path.join(basePath, `${entity}_${_id}.json`));
 			if (!file.isFile()) {
 				return null;
@@ -44,6 +59,8 @@ class LocalDB extends EntityDao {
 
 	async update(entity, data) {
 		try {
+			await this.checkDirectory();
+
 			const {_id} = data;
 			if (!_id) {
 				return null;
@@ -63,6 +80,8 @@ class LocalDB extends EntityDao {
 
 	async deleteById(entity, id) {
 		try {
+			await this.checkDirectory();
+
 			const file = await stat(path.join(basePath, `${entity}_${_id}.json`));
 			if (!file.isFile()) {
 				return null;
