@@ -1,5 +1,5 @@
 function UpdateBookingRoute() {
-	this.path = '/booking';
+	this.path = '/booking/:id';
 	this.method = 'PUT';
 	this.entity = 'Booking';
 }

@@ -1,5 +1,5 @@
 function DeleteBookingRoute() {
-	this.path = '/booking';
+	this.path = '/booking/:id';
 	this.method = 'DELETE';
 	this.entity = 'Booking';
 }

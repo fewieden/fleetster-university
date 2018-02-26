@@ -1,14 +1,22 @@
 const express = require('express');
 const booking = require('./Booking');
+const Dao = require('../system/LocalDB');
+const entityDao = new Dao();
 const routes = [booking];
 const router = express.Router();
 
-for (let group of routes) {
-	for (let route in group) {
-		const routeDetails = new group[route]();
-		router[routeDetails.method.toLowerCase()](routeDetails.path, (req, res) => {
-			res.send('Booking route');
-		});
+const controllers = {};
+
+for (let Group of routes) {
+	for (let route in Group) {
+		const routeDetails = new Group[route]();
+		const controllerName = `${routeDetails.entity}Controller`;
+		if (!controllers.hasOwnProperty(controllerName)) {
+			const Controller = require(`../controllers/${controllerName}`);
+			controllers[controllerName] = new Controller(routeDetails.entity, entityDao);
+		}
+
+		router[routeDetails.method.toLowerCase()](routeDetails.path, controllers[controllerName][route].bind(controllers[controllerName]));
 	}
 }
 

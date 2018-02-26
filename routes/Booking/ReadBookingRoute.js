@@ -1,5 +1,5 @@
 function ReadBookingRoute() {
-	this.path = '/booking';
+	this.path = '/booking/:id';
 	this.method = 'GET';
 	this.entity = 'Booking';
 }
