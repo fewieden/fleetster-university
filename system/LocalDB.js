@@ -45,12 +45,12 @@ class LocalDB extends EntityDao {
 		try {
 			await this.checkDirectory();
 
-			const file = await stat(path.join(basePath, `${entity}_${_id}.json`));
+			const file = await stat(path.join(basePath, `${entity}_${id}.json`));
 			if (!file.isFile()) {
 				return null;
 			}
 
-			const data = await read(path.join(basePath, `${entity}_${_id}.json`));
+			const data = await read(path.join(basePath, `${entity}_${id}.json`));
 			return JSON.parse(data);
 		} catch (error) {
 			return {error};
@@ -82,12 +82,12 @@ class LocalDB extends EntityDao {
 		try {
 			await this.checkDirectory();
 
-			const file = await stat(path.join(basePath, `${entity}_${_id}.json`));
+			const file = await stat(path.join(basePath, `${entity}_${id}.json`));
 			if (!file.isFile()) {
 				return null;
 			}
 
-			const data = await read(path.join(basePath, `${entity}_${_id}.json`));
+			const data = await read(path.join(basePath, `${entity}_${id}.json`));
 			const res = JSON.parse(data);
 
 			await unlink(path.join(basePath, `${entity}_${_id}.json`));

@@ -19,3 +19,5 @@ Integrated authentication/authorization process
 ## Level 5
 
 Node.js modular behavior for handling different token types
+
+**The type of the database can be specified in config.js (MongoDB, LocalDB). Example Requests are in REQUESTS.md**

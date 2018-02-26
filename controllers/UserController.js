@@ -1,8 +1,9 @@
 class UserController {
 
-	constructor(entity, entityDao) {
+	constructor({entity, entityDao, authentication}) {
 		this.entity = entity;
 		this.entityDao = entityDao;
+		this.authentication = authentication;
 	}
 
 	removeSensitiveData(model) {
@@ -13,14 +14,13 @@ class UserController {
 
 	async createUserRoute(req, res) {
 		console.log('createUserRoute');
-		// TODO: register user
+		req.body.password = await this.authentication.encryptPassword(req.body.password);
 		let model = await this.entityDao.insert(this.entity, req.body);
 		res.send(model);
 	}
 
 	async readUserRoute(req, res) {
 		console.log('readUserRoute');
-
 		let model = await this.entityDao.findById(this.entity, req.params.id);
 		this.removeSensitiveData(model);
 		res.send(model);
@@ -28,7 +28,9 @@ class UserController {
 
 	async updateUserRoute(req, res) {
 		console.log('updateUserRoute');
-
+		if (!await this.authentication.isAuthenticated(req.headers.authorization)) {
+			res.sendStatus(401);
+		}
 		delete req.body.password;
 		req.body._id = req.params.id;
 		let model = await this.entityDao.update(this.entity, req.body);
@@ -38,6 +40,9 @@ class UserController {
 
 	async deleteUserRoute(req, res) {
 		console.log('deleteUserRoute');
+		if (!await this.authentication.isAuthenticated(req.headers.authorization)) {
+			res.sendStatus(401);
+		}
 		let model = await this.entityDao.deleteById(this.entity, req.params.id);
 		this.removeSensitiveData(model);
 		res.send(model);
@@ -45,12 +50,19 @@ class UserController {
 
 	async loginUserRoute(req, res) {
 		console.log('loginUserRoute');
-		// TODO: create login
+		let model = await this.entityDao.findById(this.entity, req.body._id);
+		if (!model) {
+			res.send({error: 'Wrong credentials'});
+		}
+
+		const token = await this.authentication.login(req.body.password, model);
+		res.send(token);
 	}
 
 	async logoutUserRoute(req, res) {
 		console.log('logoutUserRoute');
-		// TODO: create logout
+		await this.authentication.logout(req.header.authorization);
+		res.send({});
 	}
 }
 
