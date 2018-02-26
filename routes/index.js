@@ -1,8 +1,9 @@
 const express = require('express');
 const booking = require('./Booking');
+const user = require('./User');
 const Dao = require('../system/LocalDB');
 const entityDao = new Dao();
-const routes = [booking];
+const routes = [booking, user];
 const router = express.Router();
 
 const controllers = {};

@@ -14,7 +14,7 @@ class LocalDB extends EntityDao {
 
 	constructor() {
 		super();
-		//create LocalDB directory
+		// TODO: create LocalDB directory
 	}
 
 	async insert(entity, data) {
