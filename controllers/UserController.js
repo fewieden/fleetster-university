@@ -29,7 +29,7 @@ class UserController {
 	async updateUserRoute(req, res) {
 		console.log('updateUserRoute');
 		if (!await this.authentication.isAuthenticated(req.headers.authorization)) {
-			res.sendStatus(401);
+			return res.sendStatus(401);
 		}
 		delete req.body.password;
 		req.body._id = req.params.id;
@@ -41,7 +41,7 @@ class UserController {
 	async deleteUserRoute(req, res) {
 		console.log('deleteUserRoute');
 		if (!await this.authentication.isAuthenticated(req.headers.authorization)) {
-			res.sendStatus(401);
+			return res.sendStatus(401);
 		}
 		let model = await this.entityDao.deleteById(this.entity, req.params.id);
 		this.removeSensitiveData(model);
@@ -51,12 +51,17 @@ class UserController {
 	async loginUserRoute(req, res) {
 		console.log('loginUserRoute');
 		let model = await this.entityDao.findById(this.entity, req.body._id);
-		if (!model) {
-			res.send({error: 'Wrong credentials'});
+		if (!model || model.error) {
+			return res.send({error: 'Wrong credentials'});
 		}
 
-		const token = await this.authentication.login(req.body.password, model);
-		res.send(token);
+		try {
+			const token = await this.authentication.login(req.body.password, model);
+			return res.send(token);
+		} catch (e) {
+			return res.send({error: 'Wrong credentials'});
+		}
+
 	}
 
 	async logoutUserRoute(req, res) {
